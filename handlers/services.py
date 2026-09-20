@@ -197,7 +197,7 @@ async def about_baby_massage(message: Message):
     )
     await message.answer(text, parse_mode="HTML")
 
-@router.message(F.text == "📰 Yangiliklar va Chegirmalar")
+@router.message(F.text.in_(["/news", "📰 Yangiliklar va Chegirmalar"]))
 async def show_news(message: Message):
     """Eng so'nggi yangiliklar va aksiyalarni ko'rish"""
     news_list = await get_latest_news(limit=5)

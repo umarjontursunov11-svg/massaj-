@@ -23,17 +23,30 @@ async def notify_new_appointment(bot: Bot, app_id: int, data: Dict[str, Any], us
     branch_manager = data.get('branch_telegram_username')
     manager_line = f"👩‍⚕️ <b>Filial mas'uli:</b> {branch_manager}\n" if branch_manager else ""
 
+    is_ortho = data.get("booking_type") == "orthopedic"
     session_dates = data.get("session_dates")
-    if session_dates:
+
+    if is_ortho:
+        header_text = f"🔔 <b>YANGI ARIZA: BOLALAR ORTOPEDI KO'RIGI! #{app_id}</b>"
+        dates_line = (
+            f"🦴 <b>Xizmat:</b> Bolalar ortopedi ko'rigi va diagnostikasi\n"
+            f"📅 <b>Ko'rik sanasi:</b> {data.get('preferred_date', '')}\n"
+        )
+        time_label = "Qabul vaqti"
+    elif session_dates and len(session_dates) > 1:
+        header_text = f"🔔 <b>YANGI QABULGA YOZILISH ARIZASI! #{app_id}</b>"
         dates_line = (
             f"📚 <b>Muolaja:</b> 10 kunlik massaj kursi\n"
             f"📅 <b>Kurs davri (10 ish kuni):</b> {session_dates[0]} — {session_dates[-1]}\n"
         )
+        time_label = "Har kungi vaqti"
     else:
+        header_text = f"🔔 <b>YANGI QABULGA YOZILISH ARIZASI! #{app_id}</b>"
         dates_line = f"📅 <b>Qabul kuni:</b> {data.get('preferred_date', '')}\n"
+        time_label = "Qabul vaqti"
 
     admin_notification = (
-        f"🔔 <b>YANGI QABULGA YOZILISH ARIZASI! #{app_id}</b>\n"
+        f"{header_text}\n"
         f"━━━━━━━━━━━━━━━━━━━━\n"
         f"🏥 <b>Filial:</b> {data['branch_name']}\n"
         f"{addr_line}"
@@ -44,7 +57,7 @@ async def notify_new_appointment(bot: Bot, app_id: int, data: Dict[str, Any], us
         f"👶 <b>Farzandning ismi:</b> {child_info}\n"
         f"📞 <b>Mijoz telefoni:</b> {data['phone']}\n"
         f"{dates_line}"
-        f"🕒 <b>Har kungi vaqti:</b> {data['preferred_time']}\n"
+        f"🕒 <b>{time_label}:</b> {data['preferred_time']}\n"
         f"{service_line}"
         f"{spec_line}"
         f"────────────────────\n"

@@ -15,10 +15,61 @@ from keyboards.inline_kb import (
     get_booking_branches_kb,
     get_dates_kb,
     get_times_kb,
-    get_booking_confirmation_kb
+    get_booking_confirmation_kb,
+    get_orthopedic_action_kb
 )
 
 router = Router()
+
+@router.message(F.text.in_([
+    "🦴 Ortoped ko'rigiga yozilish",
+    "Ortoped ko'rigiga yozilish",
+    "Ortoped ko'rigi",
+    "🦴 Ortoped ko'rigi",
+    "Ortoped"
+]))
+async def show_orthopedic_info(message: Message, state: FSMContext):
+    """Bolalar ortopedi ko'rigi haqida ma'lumot va yozilish"""
+    await state.clear()
+    text = (
+        "🦴 <b>Bolalar Ortopedi Ko'rigiga Yozilish</b>\n"
+        "━━━━━━━━━━━━━━━━━━━━\n\n"
+        "👶 <b>Markazimizda tajribali bolalar ortoped-shifokorlari quyidagi holatlar bo'yicha professional ko'rik va diagnostika o'tkazadilar:</b>\n\n"
+        "• <b>Chanoq-son bo'g'imlari displaziyasi</b> <i>(Erta aniqlash va asoratsiz davolash)</i>;\n"
+        "• <b>Maymoqlik (kosolapie)</b> va oyoq egriliklari (O-simon, X-simon oyoqlar);\n"
+        "• <b>Bo'yin qiyshiqligi (krivosheya)</b> va mushak tonusi muammolari;\n"
+        "• <b>Yassioyoqlik (ploskostopie)</b> va noto'g'ri qadam bosish holatlari;\n"
+        "• <b>Umurtqa pog'onasi nuqsonlari:</b> skolioz, kifoz, qad-qomat egriligi;\n"
+        "• Bolaning o'z vaqtida boshini ushlamasligi, o'tirmasligi yoki qadam bosmasligi.\n\n"
+        "━━━━━━━━━━━━━━━━━━━━\n"
+        "🏥 <b>Ko'rik qayerda o'tkaziladi?</b>\n"
+        "Toshkent shahri bo'ylab barcha 12 ta qulay filiallarimizda.\n\n"
+        "📋 <i>Shifokor bolani to'liq ko'rikdan o'tkazib, individual tavsiyalar va sog'lomlashtirish rejasini belgilaydi.</i>\n\n"
+        "👇 <b>Ko'rikka yozilish uchun quyidagi tugmani bosing:</b>"
+    )
+    await message.answer(text, parse_mode="HTML", reply_markup=get_orthopedic_action_kb())
+
+@router.callback_query(F.data == "start_orthopedic_booking")
+async def start_orthopedic_booking_cb(callback: CallbackQuery, state: FSMContext):
+    """Ortoped ko'rigiga filial tanlash orqali yozilishni boshlash"""
+    await callback.answer()
+    await state.clear()
+    await state.set_state(BookingState.selecting_branch)
+    await state.update_data(
+        booking_type="orthopedic",
+        service_title="Bolalar ortopedi ko'rigi va diagnostikasi"
+    )
+    
+    branches = await get_all_branches()
+    text = (
+        "🦴 <b>Ortoped Ko'rigiga Yozilish:</b>\n\n"
+        "1️⃣-qadam: Ko'rikdan o'tish uchun o'zingizga qulay bo'lgan <b>filialni tanlang:</b>"
+    )
+    await callback.message.answer(
+        text,
+        parse_mode="HTML",
+        reply_markup=get_booking_branches_kb(branches)
+    )
 
 @router.message(F.text.in_(["📝 Qabulga yozilish", "Qabulga yozilish", "📝 Ko'rikka yozilish", "Ko'rikka yozilish"]))
 async def start_booking(message: Message, state: FSMContext):
@@ -59,7 +110,10 @@ async def booking_select_branch(callback: CallbackQuery, state: FSMContext):
     )
     await state.set_state(BookingState.entering_parent_name)
     
+    curr_data = await state.get_data()
+    type_badge = "🦴 <b>Bolalar Ortopedi Ko'rigiga Yozilish:</b>\n\n" if curr_data.get("booking_type") == "orthopedic" else ""
     text = (
+        f"{type_badge}"
         f"🏥 Tanlangan filial: <b>{branch['name']}</b>\n"
         f"🏢 <b>Manzil:</b> {branch['address']}\n"
         f"☎️ <b>Filial telefoni:</b> <code>{branch['phone']}</code>\n"
@@ -176,31 +230,55 @@ async def booking_select_time(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     await state.set_state(BookingState.confirming)
     
-    from utils.reminder import calculate_10_sessions
-    session_dates = calculate_10_sessions(data['preferred_date'])
-    await state.update_data(session_dates=session_dates)
-    start_date = session_dates[0]
-    end_date = session_dates[-1]
-
+    is_ortho = data.get('booking_type') == 'orthopedic'
     manager_tg = data.get('branch_telegram_username') or "@Rixsiyeva81"
-    summary_text = (
-        "📋 <b>10 KUNLIK QABULGA YOZILISH MA'LUMOTLARI:</b>\n"
-        "━━━━━━━━━━━━━━━━━━━━\n"
-        f"🏥 <b>Filial:</b> {data['branch_name']}\n"
-        f"🏢 <b>Manzil:</b> {data.get('branch_address', '')}\n"
-        f"☎️ <b>Filial mas'uli telefoni:</b> {data.get('branch_phone', '')}\n"
-        f"👩‍⚕️ <b>Mas'ul xodim:</b> {manager_tg}\n"
-        "────────────────────\n"
-        f"👤 <b>Mijoz (Ota-ona):</b> {data['parent_name']}\n"
-        f"👶 <b>Farzandning ismi:</b> {data['child_name']}\n"
-        f"📞 <b>Mijoz telefoni:</b> {data['phone']}\n"
-        f"📚 <b>Muolaja:</b> 10 kunlik bolalar massaji kursi\n"
-        f"📅 <b>Kurs muddati:</b> {start_date} dan {end_date} gacha (10 ish kuni)\n"
-        f"⏰ <b>Har kungi qabul vaqti:</b> {data['preferred_time']}\n"
-        "━━━━━━━━━━━━━━━━━━━━\n\n"
-        "🔔 <i>Har kuni qabuldan kamida 2 soat oldin bot orqali eslatma va holatni belgilash tugmalari yuboriladi.</i>\n\n"
-        "Barcha ma'lumotlar to'g'rimi? Qabulga yozilishni tasdiqlaysizmi?"
-    )
+
+    if is_ortho:
+        session_dates = [data['preferred_date']]
+        await state.update_data(session_dates=session_dates)
+        summary_text = (
+            "📋 <b>BOLALAR ORTOPEDI KO'RIGIGA YOZILISH MA'LUMOTLARI:</b>\n"
+            "━━━━━━━━━━━━━━━━━━━━\n"
+            f"🏥 <b>Filial:</b> {data['branch_name']}\n"
+            f"🏢 <b>Manzil:</b> {data.get('branch_address', '')}\n"
+            f"☎️ <b>Filial mas'uli telefoni:</b> {data.get('branch_phone', '')}\n"
+            f"👩‍⚕️ <b>Mas'ul xodim:</b> {manager_tg}\n"
+            "────────────────────\n"
+            f"👤 <b>Mijoz (Ota-ona):</b> {data['parent_name']}\n"
+            f"👶 <b>Farzandning ismi:</b> {data['child_name']}\n"
+            f"📞 <b>Mijoz telefoni:</b> {data['phone']}\n"
+            f"🦴 <b>Xizmat:</b> Bolalar ortopedi ko'rigi va diagnostikasi\n"
+            f"📅 <b>Ko'rik sanasi:</b> {data['preferred_date']}\n"
+            f"⏰ <b>Qabul vaqti:</b> {data['preferred_time']}\n"
+            "━━━━━━━━━━━━━━━━━━━━\n\n"
+            "🔔 <i>Ko'rik vaqtidan kamida 2 soat oldin bot orqali eslatma yuboriladi.</i>\n\n"
+            "Barcha ma'lumotlar to'g'rimi? Ko'rikka yozilishni tasdiqlaysizmi?"
+        )
+    else:
+        from utils.reminder import calculate_10_sessions
+        session_dates = calculate_10_sessions(data['preferred_date'])
+        await state.update_data(session_dates=session_dates)
+        start_date = session_dates[0]
+        end_date = session_dates[-1]
+
+        summary_text = (
+            "📋 <b>10 KUNLIK QABULGA YOZILISH MA'LUMOTLARI:</b>\n"
+            "━━━━━━━━━━━━━━━━━━━━\n"
+            f"🏥 <b>Filial:</b> {data['branch_name']}\n"
+            f"🏢 <b>Manzil:</b> {data.get('branch_address', '')}\n"
+            f"☎️ <b>Filial mas'uli telefoni:</b> {data.get('branch_phone', '')}\n"
+            f"👩‍⚕️ <b>Mas'ul xodim:</b> {manager_tg}\n"
+            "────────────────────\n"
+            f"👤 <b>Mijoz (Ota-ona):</b> {data['parent_name']}\n"
+            f"👶 <b>Farzandning ismi:</b> {data['child_name']}\n"
+            f"📞 <b>Mijoz telefoni:</b> {data['phone']}\n"
+            f"📚 <b>Muolaja:</b> 10 kunlik bolalar massaji kursi\n"
+            f"📅 <b>Kurs muddati:</b> {start_date} dan {end_date} gacha (10 ish kuni)\n"
+            f"⏰ <b>Har kungi qabul vaqti:</b> {data['preferred_time']}\n"
+            "━━━━━━━━━━━━━━━━━━━━\n\n"
+            "🔔 <i>Har kuni qabuldan kamida 2 soat oldin bot orqali eslatma va holatni belgilash tugmalari yuboriladi.</i>\n\n"
+            "Barcha ma'lumotlar to'g'rimi? Qabulga yozilishni tasdiqlaysizmi?"
+        )
     
     await callback.message.edit_text(
         summary_text,
@@ -214,6 +292,7 @@ async def booking_confirmed(callback: CallbackQuery, state: FSMContext):
     await callback.answer("Ariza qabul qilinmoqda...")
     data = await state.get_data()
     user = callback.from_user
+    is_ortho = data.get("booking_type") == "orthopedic"
     
     # 1. Bazaga asosiy arizani kiritish
     app_id = await create_appointment(
@@ -226,9 +305,13 @@ async def booking_confirmed(callback: CallbackQuery, state: FSMContext):
         preferred_time=data["preferred_time"]
     )
     
-    # 2. 10 ta seansni bazaga kiritish
-    from utils.reminder import calculate_10_sessions
-    session_dates = data.get("session_dates") or calculate_10_sessions(data["preferred_date"])
+    # 2. Seanslarni bazaga kiritish (Ortoped ko'rigi uchun 1 ta seans, massaj uchun 10 ta seans)
+    if is_ortho:
+        session_dates = [data["preferred_date"]]
+    else:
+        from utils.reminder import calculate_10_sessions
+        session_dates = data.get("session_dates") or calculate_10_sessions(data["preferred_date"])
+        
     sessions_to_insert = [
         {
             "session_number": idx + 1,
@@ -256,26 +339,44 @@ async def booking_confirmed(callback: CallbackQuery, state: FSMContext):
     
     # Foydalanuvchiga muvaffaqiyat xabari
     manager_tg = data.get("branch_telegram_username") or "@Rixsiyeva81"
-    start_date = session_dates[0]
-    end_date = session_dates[-1]
 
-    success_text = (
-        f"🎉 <b>10 kunlik qabulga arizangiz muvaffaqiyatli qabul qilindi!</b>\n\n"
-        f"🆔 <b>Ariza raqami:</b> #{app_id}\n"
-        f"🏥 <b>Filial:</b> {data['branch_name']}\n"
-        f"🏢 <b>Filial manzili:</b> {data.get('branch_address', '')}\n"
-        f"☎️ <b>Filial mas'ul telefoni:</b> <code>{data.get('branch_phone', '')}</code>\n"
-        f"👩‍⚕️ <b>Filial mas'ul xodimi:</b> {manager_tg}\n"
-        f"👤 <b>Mijoz:</b> {data['parent_name']}\n"
-        f"👶 <b>Farzand:</b> {data['child_name']}\n"
-        f"📚 <b>Muolaja kursi:</b> 10 kunlik bolalar massaji\n"
-        f"📅 <b>Sanalar:</b> {start_date} dan {end_date} gacha (10 ish kuni)\n"
-        f"⏰ <b>Har kungi qabul vaqti:</b> {data['preferred_time']}\n\n"
-        f"🔔 <b>Avtomatik Eslatma:</b> Har kuni seans boshlanishidan kamida <b>2 soat oldin</b> bot orqali sizga eslatma xabari keladi. "
-        f"Unda o'z vaqtida borishingiz yoki kechikishingiz haqida xabar bera olasiz.\n\n"
-        f"Tez orada filialimiz ma'muri siz bilan bog'lanib, qabul vaqtini yana bir bor tasdiqlaydi.\n\n"
-        f"Salomat bo'ling, farzandingizni kutib qolamiz! 🌸"
-    )
+    if is_ortho:
+        success_text = (
+            f"🎉 <b>Bolalar ortopedi ko'rigiga arizangiz muvaffaqiyatli qabul qilindi!</b>\n\n"
+            f"🆔 <b>Ariza raqami:</b> #{app_id}\n"
+            f"🏥 <b>Filial:</b> {data['branch_name']}\n"
+            f"🏢 <b>Filial manzili:</b> {data.get('branch_address', '')}\n"
+            f"☎️ <b>Filial mas'ul telefoni:</b> <code>{data.get('branch_phone', '')}</code>\n"
+            f"👩‍⚕️ <b>Filial mas'ul xodimi:</b> {manager_tg}\n"
+            f"👤 <b>Mijoz:</b> {data['parent_name']}\n"
+            f"👶 <b>Farzand:</b> {data['child_name']}\n"
+            f"🦴 <b>Xizmat:</b> Bolalar ortopedi ko'rigi va diagnostikasi\n"
+            f"📅 <b>Ko'rik sanasi:</b> {data['preferred_date']}\n"
+            f"⏰ <b>Qabul vaqti:</b> {data['preferred_time']}\n\n"
+            f"🔔 <b>Avtomatik Eslatma:</b> Ko'rik vaqtidan kamida <b>2 soat oldin</b> bot orqali eslatma xabari yetkaziladi.\n\n"
+            f"Filialimiz shifokori belgilangan vaqtda farzandingizni kutib oladi. Salomat bo'ling! 🌸"
+        )
+    else:
+        start_date = session_dates[0]
+        end_date = session_dates[-1]
+
+        success_text = (
+            f"🎉 <b>10 kunlik qabulga arizangiz muvaffaqiyatli qabul qilindi!</b>\n\n"
+            f"🆔 <b>Ariza raqami:</b> #{app_id}\n"
+            f"🏥 <b>Filial:</b> {data['branch_name']}\n"
+            f"🏢 <b>Filial manzili:</b> {data.get('branch_address', '')}\n"
+            f"☎️ <b>Filial mas'ul telefoni:</b> <code>{data.get('branch_phone', '')}</code>\n"
+            f"👩‍⚕️ <b>Filial mas'ul xodimi:</b> {manager_tg}\n"
+            f"👤 <b>Mijoz:</b> {data['parent_name']}\n"
+            f"👶 <b>Farzand:</b> {data['child_name']}\n"
+            f"📚 <b>Muolaja kursi:</b> 10 kunlik bolalar massaji\n"
+            f"📅 <b>Sanalar:</b> {start_date} dan {end_date} gacha (10 ish kuni)\n"
+            f"⏰ <b>Har kungi qabul vaqti:</b> {data['preferred_time']}\n\n"
+            f"🔔 <b>Avtomatik Eslatma:</b> Har kuni seans boshlanishidan kamida <b>2 soat oldin</b> bot orqali sizga eslatma xabari keladi. "
+            f"Unda o'z vaqtida borishingiz yoki kechikishingiz haqida xabar bera olasiz.\n\n"
+            f"Tez orada filialimiz ma'muri siz bilan bog'lanib, qabul vaqtini yana bir bor tasdiqlaydi.\n\n"
+            f"Salomat bo'ling, farzandingizni kutib qolamiz! 🌸"
+        )
     
     is_admin = user.id in ADMIN_IDS
     await callback.message.answer(

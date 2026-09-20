@@ -16,7 +16,7 @@ def get_main_menu_kb(is_admin: bool = False) -> ReplyKeyboardMarkup:
             KeyboardButton(text="👶 Bolalar massaji haqida")
         ],
         [
-            KeyboardButton(text="📰 Yangiliklar va Chegirmalar"),
+            KeyboardButton(text="🦴 Ortoped ko'rigiga yozilish"),
             KeyboardButton(text="📞 Bog'lanish")
         ]
     ]

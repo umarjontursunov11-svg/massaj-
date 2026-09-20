@@ -162,7 +162,7 @@ async def cmd_help(message: Message):
         "🔹 <b>👩‍⚕️ Nazokat opa ko'rik grafigi</b> — Nazokat opaning haftalik ko'rik grafigi (Google Calendar).\n"
         "🔹 <b>🌸 Bolalar massaj kursi</b> — Bolalar massaji kursi dasturi va narxi haqida ma'lumot.\n"
         "🔹 <b>🕒 Ish vaqti</b> — Markaz va filiallar ish kunlari hamda soatlarini ko'rish.\n"
-        "🔹 <b>📰 Yangiliklar va Chegirmalar</b> — Markazimiz aksiyalari va yangiliklari.\n"
+        "🔹 <b>🦴 Ortoped ko'rigiga yozilish</b> — Bolalar ortopedi ko'rigiga navbatga yozilish va diagnostika.\n"
         "🔹 <b>👶 Bolalar massaji haqida</b> — Ota-onalar uchun foydali maslahatlar va tibbiy ko'rsatmalar.\n"
         "🔹 <b>📞 Bog'lanish</b> — Yagona Call-markaz va admin kontaktlari."
     )

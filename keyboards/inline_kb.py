@@ -18,7 +18,22 @@ def get_welcome_quick_actions_kb() -> InlineKeyboardMarkup:
             InlineKeyboardButton(text="👶 Massaj haqida", callback_data="view_about_quick")
         ],
         [
+            InlineKeyboardButton(text="🦴 Ortoped ko'rigiga yozilish", callback_data="start_orthopedic_booking"),
             InlineKeyboardButton(text="📞 Call-Markaz & Bog'lanish", callback_data="view_contact_quick")
+        ]
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+def get_orthopedic_action_kb() -> InlineKeyboardMarkup:
+    """Ortoped ko'rigi asosiy xabari ostidagi tugmalar"""
+    buttons = [
+        [
+            InlineKeyboardButton(text="📝 Ortoped ko'rigiga yozilish", callback_data="start_orthopedic_booking"),
+            InlineKeyboardButton(text="🏥 Filiallar ro'yxati", callback_data="back_to_districts")
+        ],
+        [
+            InlineKeyboardButton(text="👩‍⚕️ Nazokat opa ko'rik grafigi", callback_data="view_doctor_schedule"),
+            InlineKeyboardButton(text="💬 Administrator", url="https://t.me/Rixsiyeva81")
         ]
     ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)
