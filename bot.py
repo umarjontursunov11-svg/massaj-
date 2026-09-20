@@ -29,21 +29,23 @@ async def start_health_server():
     import os
     port = os.getenv("PORT")
     if not port:
-        return
+        return None
     try:
         from aiohttp import web
         app = web.Application()
         async def health(request):
-            return web.Response(text="OK - Nazokat79 Bot is running!")
+            return web.Response(text="OK - Nazokat79 Bot is running!", status=200)
         app.router.add_get("/", health)
         app.router.add_get("/health", health)
         runner = web.AppRunner(app)
         await runner.setup()
         site = web.TCPSite(runner, "0.0.0.0", int(port))
         await site.start()
-        logger.info(f"Health server {port}-portda muvaffaqiyatli ishga tushirildi.")
+        logger.info(f"Health server 0.0.0.0:{port} portida muvaffaqiyatli ishga tushirildi.")
+        return runner
     except Exception as e:
         logger.warning(f"Health serverni ishga tushirishda ogohlantirish: {e}")
+        return None
 
 async def set_main_commands(bot: Bot):
     """Telegram menyu buyruqlarini o'rnatish"""
@@ -55,22 +57,27 @@ async def set_main_commands(bot: Bot):
     await bot.set_my_commands(commands)
 
 async def main():
+    # Render yoki bulutli platformalarda health serverni darhol yoqish
+    health_runner = await start_health_server()
+
     if not BOT_TOKEN or BOT_TOKEN == "YOUR_TELEGRAM_BOT_TOKEN_HERE":
         logger.error(
             "\n" + "="*60 + "\n"
             "XATOLIK: Bot tokeni topilmadi yoki o'rnatilmagan!\n"
-            "Iltimos, '.env' faylini oching va Telegram @BotFather dan olgan\n"
+            "Iltimos, '.env' faylini oching yoki Render Dashboard -> Environment bo'limida\n"
             "BOT_TOKEN ingizni kiriting:\n"
             "BOT_TOKEN=123456789:ABCdefGHIjklMNOpqrsTUVwxyz\n" + "="*60
         )
-        sys.exit(1)
+        if health_runner:
+            # Render crash-loop ga tushmasligi uchun portni ochiq saqlab kutish
+            while True:
+                await asyncio.sleep(3600)
+        else:
+            sys.exit(1)
 
     logger.info("Ma'lumotlar bazasi ishga tushirilmoqda...")
     await init_db()
     logger.info("Ma'lumotlar bazasi tayyor.")
-
-    # Render yoki bulutli platformalarda health serverni yoqish
-    await start_health_server()
 
     bot = Bot(token=BOT_TOKEN)
     dp = Dispatcher(storage=MemoryStorage())
@@ -112,6 +119,11 @@ async def main():
         await dp.start_polling(bot)
     finally:
         reminder_task.cancel()
+        if health_runner:
+            try:
+                await health_runner.cleanup()
+            except Exception:
+                pass
         await bot.session.close()
 
 if __name__ == "__main__":
