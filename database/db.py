@@ -153,6 +153,9 @@ async def init_db():
         if "telegram_username" not in existing_cols:
             await db.execute("ALTER TABLE branches ADD COLUMN telegram_username TEXT")
 
+        # Ish vaqtini Dushanba - Shanba: 09:00 - 17:00 ga sinxronlash
+        await db.execute("UPDATE branches SET working_hours = 'Dushanba - Shanba: 09:00 - 17:00'")
+
         await db.commit()
 
         # Dastlabki ma'lumotlarni tekshirish va to'ldirish

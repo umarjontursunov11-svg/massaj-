@@ -190,9 +190,8 @@ def get_dates_kb() -> InlineKeyboardMarkup:
         
         # Agar bugungi kun bo'lsa, bugun uchun qolgan bo'sh vaqt slotlari borligini tekshiramiz
         if offset == 0:
-            is_saturday = (day.weekday() == 5)
-            # Shanba kuni oxirgi slot 14:00-15:00, ish kunlarida esa 16:00-17:00
-            last_start_hour = 14 if is_saturday else 16
+            # Dushanba - Shanba barcha kunlar 09:00 dan 17:00 gacha, oxirgi slot 16:00-17:00
+            last_start_hour = 16
             if now.hour >= last_start_hour:
                 # Bugun uchun barcha qabul vaqtlari o'tib ketgan, shuning uchun bugunni chiqarmaymiz
                 offset += 1
@@ -218,22 +217,16 @@ def get_times_kb(selected_date: Optional[str] = None) -> InlineKeyboardMarkup:
     now = datetime.now(timezone(timedelta(hours=5)))
     
     is_today = False
-    is_saturday = False
     
     if selected_date:
         try:
             dt = datetime.strptime(selected_date, "%Y-%m-%d")
             is_today = (dt.date() == now.date())
-            is_saturday = (dt.weekday() == 5)
         except Exception:
             pass
             
-    if is_saturday:
-        # Shanba: 10:00 dan 15:00 gacha, 1 soatlik oraliq
-        start_hours = [10, 11, 12, 13, 14]
-    else:
-        # Dushanba - Juma: 09:00 dan 17:00 gacha, 1 soatlik oraliq
-        start_hours = [9, 10, 11, 12, 13, 14, 15, 16]
+    # Dushanba - Shanba: 09:00 dan 17:00 gacha, 1 soatlik oraliq
+    start_hours = [9, 10, 11, 12, 13, 14, 15, 16]
         
     buttons = []
     row = []
