@@ -46,7 +46,7 @@ def get_course_action_kb() -> InlineKeyboardMarkup:
         ],
         [
             InlineKeyboardButton(text="📍 Qushbegi filiali manzili", callback_data="info_branch:3"),
-            InlineKeyboardButton(text="💬 Administratorga yozish", url="https://t.me/Nazokat79_Admin")
+            InlineKeyboardButton(text="💬 Administratorga yozish", url="https://t.me/Rixsiyeva81")
         ]
     ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)
@@ -69,7 +69,17 @@ def get_working_hours_kb() -> InlineKeyboardMarkup:
             InlineKeyboardButton(text="🏥 Filiallar va Manzillar", callback_data="back_to_districts")
         ],
         [
-            InlineKeyboardButton(text="💬 Administrator", url="https://t.me/Nazokat79_Admin")
+            InlineKeyboardButton(text="💬 Administrator", url="https://t.me/Rixsiyeva81")
+        ]
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+def get_contact_us_kb() -> InlineKeyboardMarkup:
+    """Bog'lanish xabari ostidagi qulay tugmalar"""
+    buttons = [
+        [
+            InlineKeyboardButton(text="💬 Telegram Administrator", url="https://t.me/Rixsiyeva81"),
+            InlineKeyboardButton(text="🏥 Filiallar va Manzillar", callback_data="back_to_districts")
         ]
     ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)
@@ -128,7 +138,7 @@ def get_all_branches_info_kb(branches: List[Dict[str, Any]]) -> InlineKeyboardMa
 def get_branch_action_kb(branch: Dict[str, Any]) -> InlineKeyboardMarkup:
     """Filial tafsilotlari ostidagi tugmalar"""
     yandex_url = branch.get('yandex_url') or f"https://yandex.uz/maps/?pt={branch['longitude']},{branch['latitude']}&z=17&l=map"
-    manager_tg = (branch.get('telegram_username') or "@Nazokat79_Admin").lstrip("@")
+    manager_tg = (branch.get('telegram_username') or "@Rixsiyeva81").lstrip("@")
     buttons = [
         [
             InlineKeyboardButton(text="📍 Geolokatsiyani olish", callback_data=f"send_loc:{branch['id']}"),

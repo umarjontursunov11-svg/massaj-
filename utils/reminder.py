@@ -62,7 +62,7 @@ async def reminder_worker(bot: Bot):
                 # Kamida 2 soat oldin (<= 120 daqiqa) va seans hali tugamagan bo'lsa (>-60 daqiqa)
                 if diff_minutes <= 120 and diff_minutes > -60:
                     user_id = session["user_id"]
-                    manager_tg = session.get("branch_telegram") or "@Nazokat79_Admin"
+                    manager_tg = session.get("branch_telegram") or "@Rixsiyeva81"
                     
                     reminder_text = (
                         f"🔔 <b>BUGUNGI QABUL ESLATMASI! (Kun #{session['session_number']}/10)</b>\n"

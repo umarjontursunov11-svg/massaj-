@@ -8,7 +8,7 @@ from aiogram.fsm.context import FSMContext
 from config import ADMIN_IDS
 from database.db import add_or_update_user, get_user_by_id, get_all_services
 from keyboards.default_kb import get_main_menu_kb
-from keyboards.inline_kb import get_welcome_quick_actions_kb, get_working_hours_kb
+from keyboards.inline_kb import get_welcome_quick_actions_kb, get_working_hours_kb, get_contact_us_kb
 
 router = Router()
 
@@ -141,17 +141,16 @@ async def contact_us(message: Message):
     text = (
         "📞 <b>«Bolalar Massaji Nazokat79» Markazi Aloqa Ma'lumotlari:</b>\n\n"
         "🏢 <b>Yagona Call-Markaz:</b>\n"
-        "☎️ +998 71 200 11 00\n"
-        "📱 +998 90 123 45 67\n\n"
+        "☎️ +998 90 1748284\n\n\n"
         "🕒 <b>Ish tartibi:</b>\n"
-        "• Dushanbadan Shambagacha: 09:00 dan 17:00 gacha\n"
-        "<i>(Yakshanba — dam olish kuni)</i>\n\n"
+        "• Dushanbadan-Shambigacha: 09:00 dan 17:00 gacha\n\n"
+        "(Yakshanba — dam olish kuni)\n\n"
         "💬 <b>Telegram Administrator:</b>\n"
-        "👉 @Nazokat79_Admin\n\n"
+        "👉 https://t.me/Rixsiyeva81\n\n"
         "📍 Toshkent shahri bo‘ylab 12 ta qulay filiallarimiz faoliyat yuritmoqda. "
         "Eng yaqin filialni bilish uchun <b>«🏥 Filiallar va Manzillar»</b> tugmasini bosing."
     )
-    await message.answer(text, parse_mode="HTML")
+    await message.answer(text, parse_mode="HTML", reply_markup=get_contact_us_kb())
 
 @router.message(Command("help"))
 async def cmd_help(message: Message):

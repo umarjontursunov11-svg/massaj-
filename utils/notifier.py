@@ -159,7 +159,7 @@ async def notify_session_response(bot: Bot, session: Dict[str, Any], response_ty
     }
     status_title, status_desc = status_map.get(response_type, ("ℹ️ Noma'lum", ""))
 
-    manager_tg = session.get("branch_telegram") or "@Nazokat79_Admin"
+    manager_tg = session.get("branch_telegram") or "@Rixsiyeva81"
 
     notification = (
         f"⚡️ <b>MIJOZDAN QABUL BO'YICHA XABAR!</b>\n"

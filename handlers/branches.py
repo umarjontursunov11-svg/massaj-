@@ -47,7 +47,7 @@ async def select_branch_info(callback: CallbackQuery):
         await callback.message.answer("Kechirasiz, filial topilmadi.")
         return
         
-    manager_tg = branch.get('telegram_username') or '@Nazokat79_Admin'
+    manager_tg = branch.get('telegram_username') or '@Rixsiyeva81'
     branch_info = (
         f"🏥 <b>{branch['name']}</b>\n"
         f"━━━━━━━━━━━━━━━━━━━━\n"
@@ -95,7 +95,7 @@ async def send_branch_location(callback: CallbackQuery):
         )
     
     yandex_link = branch.get("yandex_url") or f"https://yandex.uz/maps/?pt={branch['longitude']},{branch['latitude']}&z=17&l=map"
-    manager_tg = branch.get("telegram_username") or "@Nazokat79_Admin"
+    manager_tg = branch.get("telegram_username") or "@Rixsiyeva81"
     manager_clean = manager_tg.lstrip("@")
     
     from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton

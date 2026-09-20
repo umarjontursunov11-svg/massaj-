@@ -84,7 +84,7 @@ INITIAL_BRANCHES = [
         "latitude": 41.277773,
         "longitude": 69.337638,
         "yandex_url": "https://yandex.uz/maps/org/nazokat_79/108295207192/",
-        "telegram_username": "@Nazokat79_Admin"
+        "telegram_username": "@Rixsiyeva81"
     },
     {
         "district": "Uchtepa tumani",
@@ -156,7 +156,7 @@ INITIAL_BRANCHES = [
         "latitude": 41.422292,
         "longitude": 69.685758,
         "yandex_url": "https://yandex.uz/maps/org/nazokat_79/166836360163/",
-        "telegram_username": "@Nazokat79_Admin"
+        "telegram_username": "@Rixsiyeva81"
     }
 ]
 

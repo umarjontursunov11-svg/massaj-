@@ -48,7 +48,7 @@ async def booking_select_branch(callback: CallbackQuery, state: FSMContext):
         await callback.message.answer("Kechirasiz, filial topilmadi.")
         return
         
-    manager_tg = branch.get("telegram_username") or "@Nazokat79_Admin"
+    manager_tg = branch.get("telegram_username") or "@Rixsiyeva81"
     await state.update_data(
         branch_id=branch["id"],
         branch_name=branch["name"],
@@ -182,7 +182,7 @@ async def booking_select_time(callback: CallbackQuery, state: FSMContext):
     start_date = session_dates[0]
     end_date = session_dates[-1]
 
-    manager_tg = data.get('branch_telegram_username') or "@Nazokat79_Admin"
+    manager_tg = data.get('branch_telegram_username') or "@Rixsiyeva81"
     summary_text = (
         "📋 <b>10 KUNLIK QABULGA YOZILISH MA'LUMOTLARI:</b>\n"
         "━━━━━━━━━━━━━━━━━━━━\n"
@@ -255,7 +255,7 @@ async def booking_confirmed(callback: CallbackQuery, state: FSMContext):
         pass
     
     # Foydalanuvchiga muvaffaqiyat xabari
-    manager_tg = data.get("branch_telegram_username") or "@Nazokat79_Admin"
+    manager_tg = data.get("branch_telegram_username") or "@Rixsiyeva81"
     start_date = session_dates[0]
     end_date = session_dates[-1]
 
