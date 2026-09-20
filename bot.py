@@ -24,6 +24,27 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+async def start_health_server():
+    """Render yoki bulutli serverlar uchun port monitoring (health check)"""
+    import os
+    port = os.getenv("PORT")
+    if not port:
+        return
+    try:
+        from aiohttp import web
+        app = web.Application()
+        async def health(request):
+            return web.Response(text="OK - Nazokat79 Bot is running!")
+        app.router.add_get("/", health)
+        app.router.add_get("/health", health)
+        runner = web.AppRunner(app)
+        await runner.setup()
+        site = web.TCPSite(runner, "0.0.0.0", int(port))
+        await site.start()
+        logger.info(f"Health server {port}-portda muvaffaqiyatli ishga tushirildi.")
+    except Exception as e:
+        logger.warning(f"Health serverni ishga tushirishda ogohlantirish: {e}")
+
 async def set_main_commands(bot: Bot):
     """Telegram menyu buyruqlarini o'rnatish"""
     commands = [
@@ -47,6 +68,9 @@ async def main():
     logger.info("Ma'lumotlar bazasi ishga tushirilmoqda...")
     await init_db()
     logger.info("Ma'lumotlar bazasi tayyor.")
+
+    # Render yoki bulutli platformalarda health serverni yoqish
+    await start_health_server()
 
     bot = Bot(token=BOT_TOKEN)
     dp = Dispatcher(storage=MemoryStorage())
