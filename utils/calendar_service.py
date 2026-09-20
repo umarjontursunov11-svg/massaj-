@@ -6,7 +6,7 @@ from typing import List, Dict, Any, Optional
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
-from config import GOOGLE_CREDENTIALS_FILE, GOOGLE_CALENDAR_ID
+from config import GOOGLE_CREDENTIALS_FILE, GOOGLE_CALENDAR_ID, GOOGLE_CREDENTIALS_JSON
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +26,7 @@ UZBEK_WEEKDAYS = {
 def get_calendar_service():
     """Google Calendar API servisini qaytarish (fayl yoki muhit o'zgaruvchisi orqali)"""
     import json
-    creds_json_env = os.getenv("GOOGLE_CREDENTIALS_JSON", "").strip()
+    creds_json_env = GOOGLE_CREDENTIALS_JSON
     try:
         if creds_json_env:
             info = json.loads(creds_json_env)
