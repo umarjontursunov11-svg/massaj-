@@ -32,7 +32,7 @@ def get_doctor_schedule_kb() -> InlineKeyboardMarkup:
         ],
         [
             InlineKeyboardButton(text="🔄 Yangilash", callback_data="refresh_doctor_schedule"),
-            InlineKeyboardButton(text="💬 Administrator", url="https://t.me/Nazokat79_Admin")
+            InlineKeyboardButton(text="💬 Administrator", url="https://t.me/Rixsiyeva81")
         ]
     ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)

@@ -171,8 +171,8 @@ def format_weekly_schedule_text(data: Dict[str, Any]) -> str:
                 "ℹ️ <i>Hozirda Google Calendar to'liq sozlanish jarayonida.</i>\n\n"
                 "Nazokat opaning eng yaqin qabul vaqtini bilish yoki qabulga yozilish uchun "
                 "Call-markazimiz bilan bog'lanishingiz yoki to'g'ridan-to'g'ri filialga yozilishingiz mumkin:\n\n"
-                "☎️ +998 71 200 11 00\n"
-                "💬 @Nazokat79_Admin"
+                "☎️ +998 90 174 82 84\n"
+                "💬 @Rixsiyeva81"
             )
         elif error == "CALENDAR_NOT_FOUND":
             return (
@@ -201,8 +201,8 @@ def format_weekly_schedule_text(data: Dict[str, Any]) -> str:
             "━━━━━━━━━━━━━━━━━━━━\n\n"
             "📌 <b>Ushbu hafta uchun ko'rik kunlari hali kiritilmagan.</b>\n\n"
             "Nazokat opaning qabul kunlari tez orada yangilanadi. Aniq ma'lumot olish yoki navbatga yozilish uchun administratorga murojaat qilishingiz mumkin:\n\n"
-            "💬 Administrator: @Nazokat79_Admin\n"
-            "☎️ Call-markaz: +998 71 200 11 00"
+            "💬 Administrator: @Rixsiyeva81\n"
+            "☎️ Call-markaz: +998 90 174 82 84"
         )
 
     text = (
